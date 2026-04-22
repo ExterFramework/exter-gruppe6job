@@ -1,31 +1,36 @@
-if Config.Framework == 'QBCore'then
-    QBCore = exports[Config.FrameworkFolder]:GetCoreObject()
-else
-    ESX = exports[Config.FrameworkFolder]:getSharedObject()
+local framework = Bridge.FrameworkName
+Core = Core or Bridge.GetFrameworkObject()
+
+local function isQB()
+    return framework == 'qbcore' or framework == 'qbox'
 end
 
 local currentRep = 0
 
 function Rep()
     local p = promise.new()
-    
-    if Config.Framework == 'QBCore'then
-        QBCore.Functions.TriggerCallback('exter-contacts:getRep', function(result)
-            p:resolve(result)    
-        end, "Gruppe 6") 
+
+    if isQB() then
+        Core.Functions.TriggerCallback('exter-contacts:getRep', function(result)
+            p:resolve(result)
+        end, 'Gruppe 6')
+    elseif framework == 'esx' then
+        Core.TriggerServerCallback('exter-contacts:getRep', function(result)
+            p:resolve(result)
+        end, 'Gruppe 6')
     else
-        ESX.TriggerServerCallback('exter-contacts:getRep', function(result)
-            p:resolve(result)    
-        end, "Gruppe 6") 
+        p:resolve(0)
     end
 
     return Citizen.Await(p)
 end
 
 function Notify(msg, typ)
-    if Config.Framework == 'QBCore'then
-        QBCore.Functions.Notify(msg, typ)
+    if isQB() then
+        Core.Functions.Notify(msg, typ or 'primary')
+    elseif framework == 'esx' then
+        Core.ShowNotification(msg)
     else
-        ESX.ShowHelpNotification(msg)
+        print(('[exter-gruppe6job] %s'):format(msg))
     end
 end
