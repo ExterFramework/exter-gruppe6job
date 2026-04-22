@@ -1,87 +1,98 @@
-if Config.Framework == 'QBCore'then
-    Core = exports[Config.FrameworkFolder]:GetCoreObject()
-else
-    Core = exports[Config.FrameworkFolder]:getSharedObject()
+Core = Bridge.GetFrameworkObject()
+
+local framework = Bridge.FrameworkName
+
+local function isQB()
+    return framework == 'qbcore' or framework == 'qbox'
 end
 
 function GetPlayer(src)
-    if Config.Framework == 'QBCore' then
+    if not Core then return nil end
+    if isQB() then
         return Core.Functions.GetPlayer(src)
-    else
+    elseif framework == 'esx' then
         return Core.GetPlayerFromId(src)
     end
+    return nil
 end
 
 function Notify(src, msg, typ)
-    if Config.Framework == 'QBCore' then
-        Core.Functions.Notify(src, msg, typ)
+    if framework == 'esx' then
+        TriggerClientEvent('esx:showNotification', src, msg)
     else
-        GetPlayer(src).ShowHelpNotification(msg)
+        TriggerClientEvent('QBCore:Notify', src, msg, typ or 'primary')
     end
 end
 
-function GetItembyName(item, p)
-    if Config.Inventory == 'OX' then
-        local itemData = exports.ox_inventory:GetItem(p.PlayerData.source, item, nil, true)
-        return itemData > 0
-    else
-        if Config.Inventory == 'qb-inventory' then
-            return p.Functions.GetItemByName(item)    
-        else
-            local hasItem = false 
-            for k, v in pairs(Core.PlayerData.inventory) do
-                if v.name == item then
-                    hasItem = true
-                    break
-                end
-            end
-            return hasItem
-        end
+function GetItembyName(item, player)
+    if not player or not item then return false end
+
+    if Bridge.InventoryName == 'ox_inventory' then
+        return (exports.ox_inventory:GetItem(player.PlayerData and player.PlayerData.source or player.source, item, nil, true) or 0) > 0
     end
+
+    if isQB() then
+        return player.Functions.GetItemByName(item) ~= nil
+    end
+
+    if framework == 'esx' then
+        local invItem = player.getInventoryItem(item)
+        return invItem and invItem.count and invItem.count > 0
+    end
+
+    return false
 end
 
 function GetPlayerCID(src)
-    if Config.Framework == 'QBCore' then
-        return Core.Functions.GetPlayer(src).PlayerData.citizenid
-    else
-        return Core.GetPlayerFromId(src).identifier
+    local player = GetPlayer(src)
+    if not player then return nil end
+
+    if isQB() then
+        return player.PlayerData.citizenid
+    elseif framework == 'esx' then
+        return player.identifier
     end
+
+    return tostring(src)
 end
 
 function GetPlayerCharName(src)
     local player = GetPlayer(src)
-    if Config.Framework == 'QBCore' then
-        return player.PlayerData.charinfo.firstname.." "..player.PlayerData.charinfo.lastname
-    else
+    if not player then return 'Unknown' end
+
+    if isQB() then
+        return (player.PlayerData.charinfo.firstname or '') .. ' ' .. (player.PlayerData.charinfo.lastname or '')
+    elseif framework == 'esx' then
         return player.getName()
     end
+
+    return ('Player %s'):format(src)
 end
 
 function RegisterCallback(name, func)
-    if Config.Framework == 'QBCore' then
+    if isQB() then
         Core.Functions.CreateCallback(name, func)
-    else
+    elseif framework == 'esx' then
         Core.RegisterServerCallback(name, func)
     end
 end
 
-function ItemManager(i, a, o, p, info)
-    if Config.Framework == 'QBCore' then
-        if o == 'remove' then
-            p.Functions.RemoveItem(i,a)
-        else
-            if info then
-                p.Functions.AddItem(i,a, nil, info)
-            else
-                p.Functions.AddItem(i,a)
-            end
-            
+function ItemManager(item, amount, op, player, info)
+    if not player then return false end
+
+    if isQB() then
+        if op == 'remove' then
+            return player.Functions.RemoveItem(item, amount)
         end
-    else
-        if o == 'remove' then
-            p.removeInventoryItem(i, a)
+        return player.Functions.AddItem(item, amount, false, info or {})
+    elseif framework == 'esx' then
+        if op == 'remove' then
+            player.removeInventoryItem(item, amount)
         else
-            p.addInventoryItem(i, a)
+            player.addInventoryItem(item, amount)
         end
+        return true
     end
+
+    return false
 end

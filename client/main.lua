@@ -1,9 +1,6 @@
 --[[ Variables ]]
-if Config.Framework == 'QBCore'then
-    QBCore = exports[Config.FrameworkFolder]:GetCoreObject()
-else
-    ESX = exports[Config.FrameworkFolder]:getSharedObject()
-end
+local framework = Bridge.FrameworkName
+Core = Core or Bridge.GetFrameworkObject()
 
 local currentJobStage = "WAITING"
 local GroupID = 0
@@ -104,7 +101,7 @@ end
 function LoadItem(vehicle)
     local propModel = Config.BagsPropModels[math.random(1, #Config.BagsPropModels)]
     local propLocation = Config.propLocations[#loadedProps + 1]
-    
+
     if propLocation then
         RequestModel(propModel)
         while not HasModelLoaded(propModel) do
@@ -112,7 +109,7 @@ function LoadItem(vehicle)
         end
 
         local prop = CreateObject(propModel, 0, 0, 0, true, true, true)
-        
+
         AttachEntityToEntity(prop, vehicle, 0, propLocation.x, propLocation.y, propLocation.z, 0.0, 0.0, 95.0, false, false, false, true, 2, true)
 
 
@@ -177,7 +174,7 @@ function getPickRoute()
 
         Wait(math.random(10000, 20000))
         tempPickups = tempPickups + amount
-        
+
         GrabBagsInsideVault(tempPicked, tempPickups)
 
     else
@@ -211,7 +208,7 @@ end
 AddEventHandler("onResourceStart", function(resource)
     if resource == GetCurrentResourceName() then
         Wait(1000)
-        
+
     end
 end)
 
@@ -270,7 +267,7 @@ RegisterNetEvent("exter-gruppe6job:cl:assignDV", function(netId)
         })
 
     else
-        
+
 
         CreateThread(function()
             while isNotAssigned do
@@ -296,10 +293,10 @@ RegisterNetEvent("exter-gruppe6job:cl:assignDV", function(netId)
                         }
                     })
 
-                    isNotAssigned = false    
+                    isNotAssigned = false
 
                 end
-                Wait(sleep)
+                Wait(500)
             end
         end)
     end
@@ -320,8 +317,8 @@ RegisterNetEvent("exter-gruppe6job:vehicleStorage", function()
             slots = 40
             weight = 3300000
         end
-        
-        if Config.Inventory == "ox_inventory" then
+
+        if Bridge.InventoryName == "ox_inventory" then
             TriggerServerEvent("exter-gruppe6job:sv:OpenInventory", storageId, weight, slots)
         else
             TriggerServerEvent("inventory:server:OpenInventory", "stash", storageId, {
@@ -339,9 +336,9 @@ RegisterNetEvent("exter-gruppe6job:OpenST", function(name, amnt)
 
     --TriggerServerEvent("exter-gruppe6job:sv:OpenInventory", name, 3300000, amnt)
 
-    if Config.Inventory == "ox_inventory" then
+    if Bridge.InventoryName == "ox_inventory" then
         TriggerServerEvent("exter-gruppe6job:sv:OpenInventory", name, 3300000, amnt)
-    else  
+    else
         TriggerServerEvent('inventory:server:OpenInventory', 'stash', name, {
             maxweight = 3300000,
             slots = amnt,
@@ -369,7 +366,7 @@ RegisterNetEvent("exter-gruppe6job:Sign", function()
         contracts = Config.Contracts
     })
     SetNuiFocus(true, true)
-    
+
 end)
 
 RegisterNetEvent("exter-gruppe6job:GetRoutes", function(Routes, bid, typeC, totalpickupNumber, index)
@@ -392,8 +389,8 @@ RegisterNetEvent("exter-gruppe6job:GetRoutes", function(Routes, bid, typeC, tota
                 FreezeEntityPosition(npcPed, true)
                 SetEntityInvincible(npcPed, true)
                 SetBlockingOfNonTemporaryEvents(npcPed, true)
-                npcPedsDict[name] = npcPed      
-                
+                npcPedsDict[name] = npcPed
+
                 exports.interact:AddLocalEntityInteraction({
                     entity = npcPed,
                     name = name, -- optional
@@ -411,10 +408,10 @@ RegisterNetEvent("exter-gruppe6job:GetRoutes", function(Routes, bid, typeC, tota
                         },
                     }
                 })
-    
+
 
                 table.insert(createdNPCs, npcPed)
-                
+
             end
         end
 
@@ -438,7 +435,7 @@ RegisterNetEvent("exter-gruppe6job:GetRoutes", function(Routes, bid, typeC, tota
         EndTextCommandSetBlipName(blip)
 
         SetNewWaypoint(coords.x, coords.y)
-        
+
 
         --Here it should setup atm points...
         for i, stopInfo in ipairs(Routes) do
@@ -476,7 +473,7 @@ RegisterNetEvent("exter-gruppe6job:GetRoutes", function(Routes, bid, typeC, tota
                 createdATMs[name] = {0, amount, blipy}
 
                 table.insert(atmLeft, name)
-                if Config.DebugPrint == true then 
+                if Config.DebugPrint == true then
                 print("[DEBUG] - [exter-gruppe6job] - Created ATM on name "..name)
                 end
 
@@ -507,7 +504,7 @@ RegisterNetEvent("exter-gruppe6job:GetRoutes", function(Routes, bid, typeC, tota
                 if blip then
                     RemoveBlip(blip)
                 end
-                
+
                 ATMsRefill(textEntries)
                 cZone:destroy()
             end
@@ -523,14 +520,14 @@ end)
 
 RegisterNetEvent("exter-gruppe6job:DeliverBags", function()
 
-    if Config.Inventory == "ox_inventory" then
+    if Bridge.InventoryName == "ox_inventory" then
         TriggerServerEvent("exter-gruppe6job:sv:OpenInventory", bankId, 3300000, 40)
     else
         TriggerServerEvent("inventory:server:OpenInventory", "stash", bankId, {
             maxweight = 3300000,
             slots = 40,
         })
-        TriggerEvent("inventory:client:SetCurrentStash", bankId) 
+        TriggerEvent("inventory:client:SetCurrentStash", bankId)
     end
 end)
 
@@ -541,7 +538,7 @@ RegisterNetEvent("exter-gruppe6job:AskAtmCompleteDeliveryy", function(cAtm)
 
         local dist = 40
         TriggerServerEvent("exter-gruppe6job:sv:Grantcompletion", totalPickups, GroupID, bankId, currentIndex, dist)
-        
+
     end
 end)
 
@@ -553,7 +550,7 @@ RegisterNetEvent("exter-gruppe6job:AskCompleteDeliveryy", function(totalpickupNu
         else
             local playerCoords = GetEntityCoords(PlayerPedId(-1))
 
-            local dist = GetDistanceBetweenCoords(playerCoords, Config.CentralBank, false)
+            local dist = #(playerCoords - vector3(Config.CentralBank.x, Config.CentralBank.y, Config.CentralBank.z))
             TriggerServerEvent("exter-gruppe6job:sv:Grantcompletion", totalPickups, GroupID, bankId, currentIndex, dist)
         end
     end
@@ -581,7 +578,7 @@ RegisterNetEvent("exter-gruppe6job:CompleteDelivery", function()
     bankId = nil
     totalPicked = 0
     tempPickups = 0
-    tempPicked = 0    
+    tempPicked = 0
     blip = nil
     pickupType = nil
     lastDeleted = nil
@@ -599,21 +596,21 @@ end)
 
 RegisterNetEvent("exter-gruppe6job:RemovePickup", function(name, amnt)
 
-    if lastDeleted ~= name then 
+    if lastDeleted ~= name then
         deleteRouteByName(name)
         lastDeleted = name
         tempPicked = tempPicked + amnt
 
         GrabBagsInsideVault(tempPicked, tempPickups)
-        
+
         if blip then
             RemoveBlip(blip)
         end
-        Wait(math.random(3000, 5000))  
+        Wait(math.random(3000, 5000))
         WaitingLeaders()
         if tempPicked > #loadedProps then
             local a = tempPicked - #loadedProps
-            TriggerServerEvent("exter-gruppe6job:sv:BagTask", a, GroupID)     
+            TriggerServerEvent("exter-gruppe6job:sv:BagTask", a, GroupID)
         end
         Wait(math.random(5000, 15000))
         getPickRoute()
@@ -623,7 +620,7 @@ end)
 RegisterNetEvent("exter-gruppe6job:RemoveAtmPickup", function(name, amnt)
     local bb = createdATMs[name][3]
 
-    createdATMs[name][1] = amnt 
+    createdATMs[name][1] = amnt
 
     removeElementByValue(atmLeft, name)
 
@@ -635,7 +632,7 @@ RegisterNetEvent("exter-gruppe6job:RemoveAtmPickup", function(name, amnt)
         RemoveBlip(bb)
     end
 
-    Wait(math.random(7000, 8000))  
+    Wait(math.random(7000, 8000))
 
     local textEntries = ATMsReful()
     local i = 1
@@ -643,7 +640,7 @@ RegisterNetEvent("exter-gruppe6job:RemoveAtmPickup", function(name, amnt)
         table.insert(textEntries, "#"..i.." ATM "..value[1].."/"..value[2])
         i = i + 1
     end
-    
+
     ATMsRefill(textEntries)
 
 end)
@@ -667,7 +664,7 @@ RegisterNetEvent("exter-gruppe6job:BagTask", function(type, amnt)
         if type == 'load' then
             for i = 1, amnt do
                 LoadItem(veh)
-            end       
+            end
         elseif type == 'unload' then
             for i = 1, amnt do
                 UnloadItem()
@@ -697,14 +694,14 @@ RegisterNetEvent("exter-gruppe6job:DeliveryVeh", function(args)
         elseif reqVeh == "Blockade" then tmpVeh = Config.BrickadeVehicle
         elseif reqVeh == "Stockade" then tmpVeh = Config.StockadeVehicle
         end
-         
+
         if m ~= tmpVeh then
             WrongVehicle()
             return
         end
 
-        if Config.Framework == 'QBCore' then
-            QBCore.Functions.SpawnVehicle(m, function(veh)  
+        if framework == 'qbcore' or framework == 'qbox' then
+            Core.Functions.SpawnVehicle(m, function(veh)
                 SetEntityHeading(veh, spawnPoint.w)
                 SetVehicleEngineOn(veh, false, false)
                 SetVehicleOnGroundProperly(veh)
@@ -719,33 +716,33 @@ RegisterNetEvent("exter-gruppe6job:DeliveryVeh", function(args)
                 elseif m == Config.BrickadeVehicle then
                     SetVehicleColours(veh, 0, 0)
                 end
-    
+
                 local netId = NetworkGetNetworkIdFromEntity(veh)
                 TriggerServerEvent("exter-gruppe6job:sv:assignDV", netId, GroupID)
-    
+
             end, spawnPoint, true)
-        else
-            ESX.Game.SpawnVehicle(m, spawnPoint, spawnPoint.w, function(veh)
+        elseif framework == 'esx' then
+            Core.Game.SpawnVehicle(m, spawnPoint, spawnPoint.w, function(veh)
                 SetEntityHeading(veh, spawnPoint.w)
                 SetVehicleEngineOn(veh, false, false)
                 SetVehicleOnGroundProperly(veh)
-                SetVehicleNeedsToBeHotwired(veh, false)  
-                maxVehFuel(veh)        
+                SetVehicleNeedsToBeHotwired(veh, false)
+                maxVehFuel(veh)
 
                 TriggerEvent("keys:received", GetVehicleNumberPlateText(veh))
                 SetVehicleDoorsLocked(veh,1)
-    
+
                 if m == Config.SpeedoVehicle then
                     SetVehicleLivery(veh, 1)
                 elseif m == Config.BrickadeVehicle then
                     SetVehicleColours(veh, 0, 0)
                 end
-    
+
                 local netId = NetworkGetNetworkIdFromEntity(veh)
                 TriggerServerEvent("exter-gruppe6job:sv:assignDV", netId, GroupID)
 
             end)
-        end      
+        end
     end
 end)
 
@@ -754,11 +751,11 @@ end)
 local isCooldownNotificationActive = false
 
 RegisterNUICallback("exter-gruppe6job:StartShit", function(data)
-    if cooldown == true then 
+    if cooldown == true then
         if not isCooldownNotificationActive then
             isCooldownNotificationActive = true
             NotifyCooldownRepeatedly()
-            if Config.DebugPrint == true then 
+            if Config.DebugPrint == true then
                 print("[DEBUG] - [exter-gruppe6job] - I got cooldown: " .. tostring(cooldown))
             end
             -- Define um temporizador para desativar a proteção após o cooldown
@@ -785,7 +782,7 @@ RegisterNUICallback("exter-gruppe6job:StartShit", function(data)
     reqVeh = Config.Contracts[index].veh
     totalPickups = Config.Contracts[index].bags
 
-    TriggerServerEvent("exter-gruppe6job:StartGrpPickups", index, GroupID)    
+    TriggerServerEvent("exter-gruppe6job:StartGrpPickups", index, GroupID)
 
     if deliveryVehNetId == nil then
         GrabDeliveryVehicle()
@@ -796,11 +793,11 @@ RegisterNUICallback("exter-gruppe6job:StartShit", function(data)
     end
 
     if Config.Contracts[index].type == 'Bank Delivery' or Config.Contracts[index].type == 'Refill Atm' then
-        if cooldown == true then 
+        if cooldown == true then
             if not isCooldownNotificationActive then
                 isCooldownNotificationActive = true
                 NotifyCooldownRepeatedly()
-                if Config.DebugPrint == true then 
+                if Config.DebugPrint == true then
                     print("[DEBUG] - [exter-gruppe6job] - I got cooldown: " .. tostring(cooldown))
                 end
                 Citizen.SetTimeout(Config.CooldownTime, function()
@@ -809,7 +806,7 @@ RegisterNUICallback("exter-gruppe6job:StartShit", function(data)
             end
             Citizen.Wait(Config.CooldownTime)
             cooldown = false
-        elseif cooldown == false then 
+        elseif cooldown == false then
             PickupMission(index)
         end
     end
@@ -832,13 +829,13 @@ function NotifyCooldownRepeatedly()
 
         -- Display the remaining time in the notification
         Notify("You have a cooldown of " .. minutesRemaining .. " minutes and " .. secondsRemaining .. " seconds remaining.", "error")
-        
+
         Citizen.Wait(30000) -- Wait for 30 seconds
     end
 
     -- Final notification after cooldown ends (optional)
     Notify("Cooldown period has ended. Good Work !", "success")
-    cooldown = false 
+    cooldown = false
     isCooldownNotificationActive = false
 end
 
@@ -848,17 +845,18 @@ RegisterNUICallback("exter-gruppe6job:hideMenu", function()
 end)
 
 RegisterNetEvent("exter-gruppe6job:consumeBag", function()
-    QBCore.Functions.Progressbar("openg6bag", "Opening Gruppe6 Bag", 5000, false, true, {
-        disableMovement = true,
-        disableCarMovement = true,
-        disableMouse = false,
-        disableCombat = true
+    if framework == 'qbcore' or framework == 'qbox' then
+        Core.Functions.Progressbar('openg6bag', 'Opening Gruppe6 Bag', 5000, false, true, {
+            disableMovement = true,
+            disableCarMovement = true,
+            disableMouse = false,
+            disableCombat = true
         }, {}, {}, {}, function()
             TriggerServerEvent('exter-gruppe6job:sv:consumeBag')
-        end, function()
-            -- This code runs if the progress bar gets cancelled
-    end)
-
+        end)
+    else
+        TriggerServerEvent('exter-gruppe6job:sv:consumeBag')
+    end
 end)
 
 
@@ -913,13 +911,13 @@ CreateThread(function()
                             if model == GetHashKey(Config.SpeedoVehicle) or model == GetHashKey(Config.StockadeVehicle) or model == GetHashKey(Config.BrickadeVehicle) then
                                 DeleteVehicle(vehicle)
                                 NotifyVehicleStoredSucessfully()
-                            else 
+                            else
                                 Notify("Do you think that i'm a fucking garage?", "error")
                             end
                         end
                     end
                 end
-            end  
-        Wait(sleep)
+            end
+        Wait(500)
     end
 end)

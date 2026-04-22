@@ -34,6 +34,7 @@ server_scripts {
 
 shared_scripts {
 	'shared/config.lua',
+	'shared/bridge.lua',
     'shared/utils.lua',
 	'locales/**.lua'
 }
