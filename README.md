@@ -1,4 +1,4 @@
-# exter Developments - Gruppe6 Job System - by Sobing4413
+# ExterFramework - Gruppe6 Job System
 
 - Hello, first of all thank you for purchasing our script !
 - Don't forget to configure the `shared/config.lua` file according to your server.
