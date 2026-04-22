@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="assets/main.js"></script>
+    <title>g6Tab</title>
+  </head>
+  <body>
+    <div id="bD" class="bigBoy">
+      <div class="_header_vcubc_11" style="background-color: rgb(5, 5, 5);"><img class="_logo_vcubc_20"
+          src="data:image/png;base64,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">
+        <h1 class="_name_vcubc_23">Gruppe6</h1>
+        <div class="_controls_vcubc_32"><button class="_btn_vcubc_38"><svg aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg" class="solid-fa" viewBox="0 0 512 512"
+              style="height: 1em; vertical-align: -0.125em; transform-origin: center center; overflow: visible;">
+              <g transform="translate(256 256)" transform-origin="128 0">
+                <g transform="translate(0,0) scale(1,1)">
+                  <path d="M32 416c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H32z"
+                    fill="currentColor" transform="translate(-256 -256)"></path>
+                </g>
+              </g>
+            </svg></button><button class="_btn_vcubc_38"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+              class="solid-fa" viewBox="0 0 384 512"
+              style="height: 1em; vertical-align: -0.125em; transform-origin: center center; overflow: visible;">
+              <g transform="translate(192 256)" transform-origin="96 0">
+                <g transform="translate(0,0) scale(1,1)">
+                  <path
+                    d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
+                    fill="currentColor" transform="translate(-192 -256)"></path>
+                </g>
+              </g>
+            </svg></button></div>
+      </div>
+    </div>
+    <div id="main" class="container">
+      <div class="sidebar left">
+        <img
+          src="assets/bg-lines-25880a64.svg"
+          alt="Left Sidebar"
+          style="height: 100%"
+        />
+      </div>
+      <div class="center-content">
+        <div class="header">
+          <div class="_hero_16gfw_6" style="margin-right: 10px">
+            <div class="_logo_container_16gfw_13">
+              <img src="assets/g6.png" class="_logo_16gfw_13" alt="Logo" />
+            </div>
+            <div class="_title_16gfw_18">
+              <h3
+                style="margin-top: 5px; margin-bottom: 0px; font-weight: normal"
+              >
+                Welcome
+              </h3>
+              <span>Gruppe6</span>
+            </div>
+
+            <div class="_nav_menu_bi6yx_93">
+              <button class="_active_bi6yx_115">Contract Offers</button
+              ><button class="">ATM Management</button>
+            </div>
+          </div>
+
+          <div class="_hero_16gfw_6">
+            <div class="_logo_container_16gfw_13">
+              <img src="assets/flash.png" class="_logo_16gfw_13" alt="Logo" />
+            </div>
+
+            <div class="_title_16gfw_19">
+              <h3 style="margin-top: 5px; margin-bottom: 4px">Progression</h3>
+
+              <div class="_bar_outer_16gfw_67">
+                <div id="repPourcentage" class="repProgressValue"></div>
+                <div class="_bar_cover_16gfw_75"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="tasksList" class="tasks"></div>
+      </div>
+      <div class="sidebar right">
+        <!-- Image or content for right sidebar -->
+        <img
+          src="assets/bg-lines-25880a64.svg"
+          alt="Right Sidebar"
+          style="height: 100%"
+        />
+      </div>
+    </div>
+  </body>
+</html>
